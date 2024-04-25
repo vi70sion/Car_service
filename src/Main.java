@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
 
@@ -20,6 +24,27 @@ public class Main {
 //        KlientaiIrJuAuto.csv, PakaitiniaiAutomobiliai.csv, SuremontuotuAutomobiliuIstorija.csv
 
 
+        Scanner scanner = new Scanner(System.in);
+        String filePathClients = "C:\\JavaTest\\KlientaiIrJuAuto.csv";
+        String filePathReplaceCar = "C:\\JavaTest\\PakaitiniaiAutomobiliai.csv";
+        String filePathServicedCarHistory = "C:\\JavaTest\\SuremontuotuAutomobiliuIstorija.csv";
+        ServiceManagement management = new ServiceManagement();
+        List<Customer> customerList = new ArrayList<>();
+
+        String choice = "";
+        do{
+            System.out.println("(1)- nuskaityti klientų duomenis iš failo, (0)- pabaiga");
+            choice = scanner.nextLine();
+            switch(choice){
+                case "1":
+                    customerList.clear();
+                    management.importCustomersFromCSV(filePathClients, customerList);
+
+                    break;
+                case "0":
+                    break;
+            }
+        } while (!choice.equals("0"));
 
 
         //System.out.println("Hello world!");
