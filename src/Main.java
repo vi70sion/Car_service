@@ -39,6 +39,7 @@ public class Main {
                 case "1":
                     customerList.clear();
                     management.importCustomersFromCSV(filePathClients, customerList);
+                    System.out.println();
 
                     break;
                 case "0":
@@ -47,6 +48,6 @@ public class Main {
         } while (!choice.equals("0"));
 
 
-        //System.out.println("Hello world!");
+
     }
 }
