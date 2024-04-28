@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Customer {
@@ -5,16 +6,15 @@ public class Customer {
     private String name;
     private String lastName;
     private String eMail;
-    private String replCar;
-    private List<Car> customerCarList;
+    private Car replCar;
+    public List<Car> customerCarList = new ArrayList<>();
 
-    public Customer(int id, String name, String lastName, String eMail, String replCar, List<Car> customerCarList) {
+    public Customer(int id, String name, String lastName, String eMail, Car replCar) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.eMail = eMail;
         this.replCar = replCar;
-        this.customerCarList = customerCarList;
     }
 
     public int getId() { return id; }
@@ -25,11 +25,19 @@ public class Customer {
     public void setLastName(String lastName) { this.lastName = lastName; }
     public String geteMail() { return eMail; }
     public void seteMail(String eMail) { this.eMail = eMail; }
-    public String getReplCar() { return replCar; }
-    public void setReplCar(String replCar) { this.replCar = replCar; }
-    public List<Car> getCustomerCarList() { return customerCarList; }
-    public void setCustomerCarList(List<Car> customerCarList) { this.customerCarList = customerCarList; }
+    public Car getReplCar() { return replCar; }
+    public void setReplCar(Car replCar) { this.replCar = replCar; }
+    @Override
+    public boolean equals(Object object){
+        Customer customer = (Customer) object;
+        if(customer.id == this.id){
+            return true;
+        }
+        return false;
+    }
 
-
-
+    @Override
+    public String toString(){
+        return getId() + " " + getName() + " " + getLastName() + " " + geteMail();
+    }
 }

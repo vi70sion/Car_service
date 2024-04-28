@@ -21,4 +21,8 @@ public class Car {
     public void setFuelType(FuelType fuelType) { this.fuelType = fuelType; }
 
 
+    @Override
+    public String toString(){
+        return brand + " " + model + " " + year + " " + fuelType;
+    }
 }

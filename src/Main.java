@@ -30,24 +30,75 @@ public class Main {
         String filePathServicedCarHistory = "C:\\JavaTest\\SuremontuotuAutomobiliuIstorija.csv";
         ServiceManagement management = new ServiceManagement();
         List<Customer> customerList = new ArrayList<>();
+        List<Car> replaceCarList = new ArrayList<>();
 
         String choice = "";
         do{
-            System.out.println("(1)- nuskaityti klientų duomenis iš failo, (0)- pabaiga");
+            System.out.println("(1)- nuskaityti klientų duomenis ir pakaitinius automobilius iš failų,");
+            System.out.println("(2)- registruoti naują automobilį remontui ir gauti pakaitinį, ");
+            System.out.println("(3)- remontuojamų automobilių sąrašas, ");
+            System.out.println("(4)- grąžinti klientui suremontuotą automobilį, (0)- pabaiga");
             choice = scanner.nextLine();
             switch(choice){
                 case "1":
                     customerList.clear();
-                    management.importCustomersFromCSV(filePathClients, customerList);
-                    System.out.println();
-
+                    management.importAllCustomersFromCSV(filePathClients, customerList);
+                    management.importReplaceCarsListFromCSV(filePathReplaceCar, replaceCarList);
+                    System.out.println("Įvykdyta.");
+                    break;
+                case "2":
+                    System.out.println("Pasirinkite klientą (ID): ");
+                    printCustomerList(customerList);
+                    String input = scanner.nextLine();
+                    Customer custSelection = customerList.get(Integer.parseInt(input) - 1);
+                    System.out.println("Pasirinkite automobilį (ID): ");
+                    int i = 0;
+                    for(Car item : custSelection.customerCarList){  //print customer car list
+                        i++;
+                        System.out.println(i + " " + item);
+                    }
+                    Car carSelection = custSelection.customerCarList.get(Integer.parseInt(scanner.nextLine())-1);
+                    System.out.println("Pasirinktas automobilis " + carSelection);
+                    management.registerCarForService(carSelection); //register car for service
+                    int carNumberInList = 0;
+                    for(Customer item : customerList){
+                        if(item.equals(custSelection)){
+                            carNumberInList = management.assignReplaceCar(replaceCarList); //get random int number, car index in replacement car list
+                            item.setReplCar(replaceCarList.get(carNumberInList));   // assign car to customer
+                            System.out.println("Klientui suteiktas pakaitinis automobilis:");
+                            System.out.println(item.getReplCar());
+                            replaceCarList.remove(carNumberInList); //remove selected car from replacement car list
+                            break;
+                        }
+                    }
+                    break;
+                case "3":
+                    System.out.println("Šiuo metu remontuojami automobiliai:");
+                    for(Car item : management.getCarsInServiceList()){
+                        System.out.println(item);
+                    }
+                    break;
+                case "4":
+                    System.out.println("Pasirinkite automobilį, kuriam baigtas remontas (ID):");
+                    int j = 0;
+                    for(Car item : management.getCarsInServiceList()){
+                        j++;
+                        System.out.println(j + " " + item);
+                    }
+                    int selection = Integer.parseInt(scanner.nextLine())-1;
+                    management.returnCustomersCar(filePathServicedCarHistory, management.getCarsInServiceList().get(selection)); //write car service history to csv
+                    management.getCarsInServiceList().remove(selection); //remove car from service list
                     break;
                 case "0":
                     break;
             }
         } while (!choice.equals("0"));
 
-
-
     }
+    public static void printCustomerList(List<Customer> list){
+        for(Customer item : list){
+            System.out.println(item);
+        }
+    }
+
 }

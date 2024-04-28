@@ -1,72 +1,97 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
 
 public class ServiceManagement implements Interface{
 
-    private List<Car> carsInServiceList;
-
-
-    public List<Car> getCarsInServiceList() {  return carsInServiceList; }
-    public void setCarsInServiceList(List<Car> carsInServiceList) { this.carsInServiceList = carsInServiceList; }
+    private List<Car> carsInServiceList = new ArrayList<>();
+    public List<Car> getCarsInServiceList() { return carsInServiceList; }
 
     public void registerCarForService(Car car){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Įveskite gedimą: ");
+        String defect = scanner.nextLine();
+        carsInServiceList.add(new CarInService(car.getBrand(), car.getModel(), car.getYear(), car.getFuelType(), defect));
     }
 
-    public void assignReplaceCar(){
+    public int assignReplaceCar(List<Car> replaceCarList){
+        Random random = new Random();
+        int randomNumber = random.nextInt(replaceCarList.size());
+        return randomNumber;
     }
 
-    public void returnCustomersCar (Car car){  //iraso automobili i SuremontuotuAutomobiliuIstorija.CSV
+    public void returnCustomersCar (String filePath, Car car){  //iraso automobili i SuremontuotuAutomobiliuIstorija.CSV
+        try {
+            FileWriter fileWriter = new FileWriter(filePath, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(car.getBrand()+ "," + car.getModel() + "," + car.getYear() + "," + car.getFuelType());
+            bufferedWriter.newLine();
+            bufferedWriter.close();
+            fileWriter.close();
+        } catch (IOException e) {
+            System.err.println("Nepavyko rasyti failo: " + e.getMessage());
+        }
+
     }
 
     @Override
-    public void importCustomersFromCSV(String filePath, List<Customer> list) {
-        Customer customer;
+    public void importAllCustomersFromCSV(String filePath, List<Customer> list){
         try{
-            FileReader reader = new FileReader(filePath);
-            BufferedReader bufferedReader = new BufferedReader(reader);
-            List<String> sortedList = new ArrayList<>();
-            List<Car> customerCarList = new ArrayList<>();
-
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
+            Customer customer = null;
             String line;
             while ((line = bufferedReader.readLine()) != null ) {
-                sortedList.add(line);
-            }
-            Collections.sort(sortedList);
-
-            String[] lineValues1 = sortedList.get(0).split(",");
-            customerCarList.add(new Car(lineValues1[4], lineValues1[5], Integer.parseInt(lineValues1[6]), FuelType.valueOf(lineValues1[7].toUpperCase())));
-            for(int i= 1; i < sortedList.size(); i++){
-                String[] lineValues2 = sortedList.get(i).split(",");
-                if(lineValues1[0].equals(lineValues2[0])){ // if the same customer, adding cars to customer car list
-                    customerCarList.add(new Car(lineValues2[4], lineValues2[5], Integer.parseInt(lineValues2[6]), FuelType.valueOf(lineValues2[7].toUpperCase())));
-
-                } else {
-                    if(lineValues1.length == 8){  // private customer
-                        list.add(new Customer(Integer.parseInt(lineValues1[0]), lineValues1[1], lineValues1[2], lineValues1[3], null, new ArrayList<>(customerCarList)));
-                    } else if (lineValues1.length == 10) {   //business customer
-                        list.add(new BusinessCustomer(Integer.parseInt(lineValues1[0]), lineValues1[1], lineValues1[2], lineValues1[3], null, new ArrayList<>(customerCarList),
-                                lineValues1[8], lineValues1[9]));
+                String[] lineValues = line.split(",");
+                Car car = new Car(lineValues[4], lineValues[5], Integer.parseInt(lineValues[6]), FuelType.valueOf(lineValues[7].toUpperCase()));
+                if(lineValues.length == 8) {    //private customer
+                    customer = new Customer(Integer.parseInt(lineValues[0]), lineValues[1], lineValues[2], lineValues[3], null);
+                    if(list.contains(customer)){
+                        for(Customer item : list){
+                            if(item.equals(customer)){
+                                item.customerCarList.add(car);
+                            }
+                        }
+                    } else {
+                        customer.customerCarList.add(car);
+                        list.add(customer);
                     }
-                    customerCarList.clear();
-                    customerCarList.add(new Car(lineValues2[4], lineValues2[5], Integer.parseInt(lineValues2[6]), FuelType.valueOf(lineValues2[7].toUpperCase())));
+                } else {    // business customer
+                    customer = new BusinessCustomer(Integer.parseInt(lineValues[0]), lineValues[1], lineValues[2], lineValues[3], null,
+                            lineValues[8], lineValues[9]);
+                    if(list.contains(customer)){
+                        for(Customer item : list){
+                            if(item.equals(customer)){
+                                item.customerCarList.add(car);
+                            }
+                        }
+                    } else {
+                        customer.customerCarList.add(car);
+                        list.add(customer);
+                    }
                 }
-                lineValues1 = Arrays.copyOf(lineValues2, lineValues2.length);
             }
-            // couldn't think of a smarter way to add the last line
-            if(lineValues1.length == 8){  // private customer
-                list.add(new Customer(Integer.parseInt(lineValues1[0]), lineValues1[1], lineValues1[2], lineValues1[3], null, new ArrayList<>(customerCarList)));
-            } else if (lineValues1.length == 10) {   //business customer
-                list.add(new BusinessCustomer(Integer.parseInt(lineValues1[0]), lineValues1[1], lineValues1[2], lineValues1[3], null, new ArrayList<>(customerCarList),
-                        lineValues1[8], lineValues1[9]));
-            }
-            bufferedReader.close();
-        }catch (IOException e) {
+        } catch (IOException e){
             System.err.println("Nepavyko skaityti failo: " + e.getMessage());
         }
     }
 
+    @Override
+    public void importReplaceCarsListFromCSV(String filePath, List<Car> list){
+        try{
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
+            String line;
+            while ((line = bufferedReader.readLine()) != null){
+                String[] lineValues = line.split(",");
+                list.add(new ReplaceCar(lineValues[0], lineValues[1], Integer.parseInt(lineValues[2]),
+                        FuelType.valueOf(lineValues[3].toUpperCase()), Integer.parseInt(lineValues[4])));
+            }
+        } catch (IOException e){
+            System.err.println("Nepavyko skaityti failo: " + e.getMessage());
+        }
+    }
 
 }
+
+

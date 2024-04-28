@@ -9,6 +9,13 @@ public class CarInService extends Car{
     public String getDefects() { return defects; }
     public void setDefects(String defects) { this.defects = defects; }
 
+    @Override
+    public String toString(){
+        return super.toString() + " " + defects;
+    }
 
+    public String getCarInfoForCSV(){
+        return getBrand() + "," + getModel() + "," + getYear() + "," + getFuelType() + "," + getDefects();
+    }
 
 }
