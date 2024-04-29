@@ -26,7 +26,8 @@ public class ServiceManagement implements Interface{
         try {
             FileWriter fileWriter = new FileWriter(filePath, true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(car.getBrand()+ "," + car.getModel() + "," + car.getYear() + "," + car.getFuelType());
+            CarInService car1 = (CarInService) car;
+            bufferedWriter.write(car1.getBrand()+ "," + car1.getModel() + "," + car1.getYear() + "," + car1.getFuelType() + "," + car1.getDefects());
             bufferedWriter.newLine();
             bufferedWriter.close();
             fileWriter.close();
