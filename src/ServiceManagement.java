@@ -73,6 +73,7 @@ public class ServiceManagement implements Interface{
                     }
                 }
             }
+            bufferedReader.close();
         } catch (IOException e){
             System.err.println("Nepavyko skaityti failo: " + e.getMessage());
         }
