@@ -89,6 +89,7 @@ public class ServiceManagement implements Interface{
                 list.add(new ReplaceCar(lineValues[0], lineValues[1], Integer.parseInt(lineValues[2]),
                         FuelType.valueOf(lineValues[3].toUpperCase()), Integer.parseInt(lineValues[4])));
             }
+            bufferedReader.close();
         } catch (IOException e){
             System.err.println("Nepavyko skaityti failo: " + e.getMessage());
         }
